@@ -1,7 +1,7 @@
 #!/bin/bash
-# Versión 1.1
+# Versión 1.2
 # VARIABLES Y FORMATOS
-declare -a array_argumentos=($@)
+declare -a array_argumentos=("$@")
 declare -i var_numero_argumentos=$#
 col_yellow='\033[1;33m'
 col_red='\033[31m'
@@ -12,7 +12,7 @@ printf "${col_yellow}Ejecutando script ...${nc}\n"
 # COMPROBACIÓN DE LA INSTALACIÓN DEL SCRIPT
 if [ ! -e "/usr/bin/reducir" ]; then
         printf "${col_red}No existe el enlace simbólico, así que lo creo.${nc}\n"
-        sudo ln -s $PWD/reducir.sh /usr/bin/reducir
+        sudo ln -s "$PWD/reducir.sh" /usr/bin/reducir
 fi
 
 # COMPROBACIÓN DE SI SE HAN INTRODUCIDO ARGUMENTOS
@@ -30,9 +30,9 @@ fi
 
 
 # EJECUTO LA ACCIÓN
-echo gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=${array_argumentos[@]}
-gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=${array_argumentos[@]}
+echo gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${array_argumentos[0]}" "${array_argumentos[@]:1}"
+gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${array_argumentos[0]}" "${array_argumentos[@]:1}"
 
 printf "${col_yellow}Reducción aparentemente realizada${nc}\n"
-ls ${array_argumentos[-1]}
+ls "${array_argumentos[-1]}"
 exit 0
