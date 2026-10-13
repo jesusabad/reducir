@@ -1,5 +1,5 @@
 #!/bin/bash
-# Versión 1.2
+# Versión 1.3
 # VARIABLES Y FORMATOS
 declare -a array_argumentos=("$@")
 declare -i var_numero_argumentos=$#
@@ -10,15 +10,21 @@ nc='\033[0m'
 printf "${col_yellow}Ejecutando script ...${nc}\n"
 
 # COMPROBACIÓN DE LA INSTALACIÓN DEL SCRIPT
-if [ ! -e "/usr/bin/reducir" ]; then
+if [ ! -e "/usr/local/bin/reducir" ]; then
         printf "${col_red}No existe el enlace simbólico, así que lo creo.${nc}\n"
-        sudo ln -s "$PWD/reducir.sh" /usr/bin/reducir
+        sudo ln -s "$PWD/reducir.sh" /usr/local/bin/reducir
 fi
 
 # COMPROBACIÓN DE SI SE HAN INTRODUCIDO ARGUMENTOS
 if [ $var_numero_argumentos = 0 ]; then
         printf "${col_red}No has introducido argumentos. Por ejemplo 'reducir reducido.pdf original.pdf'${nc}\n"
         exit 1
+fi
+
+# EVITAR SOBREESCRITURA DEL ARCHIVO DE SALIDA
+if [ -e "${array_argumentos[0]}" ]; then
+    printf "${col_red}El archivo de salida '%s' ya existe. Abortando para evitar sobrescritura.${nc}\n" "${array_argumentos[0]}"
+    exit 1
 fi
 
 # MINI DOCUMENTACIÓN SEGÚN EL NIVEL VE COMPRESIÓN DESEADO:
@@ -28,11 +34,10 @@ fi
 # dPDFSETTINGS=/prepress (300 dpi, alta calidad preservando el color)
 # dPDFSETTINGS=/default (casi idéntico a screen, pero con calidad ligeramente superior)
 
-
 # EJECUTO LA ACCIÓN
 echo gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${array_argumentos[0]}" "${array_argumentos[@]:1}"
 gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${array_argumentos[0]}" "${array_argumentos[@]:1}"
 
 printf "${col_yellow}Reducción aparentemente realizada${nc}\n"
-ls "${array_argumentos[-1]}"
+ls -lh "${array_argumentos[0]}"
 exit 0
